@@ -28,8 +28,7 @@
         };
 
         defaultPackage = pkgs.callPackage ./src
-          { inherit pkgs;
-            compiler = "ghc884";
+          { compiler = pkgs.haskell.packages.ghc884;
           };
       }
     ); # // { overlay = import ./overlay.nix {}; };
