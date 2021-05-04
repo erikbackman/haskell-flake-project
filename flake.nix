@@ -12,24 +12,27 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ devshell.overlay ];
+          overlays = [ devshell.overlay (import ./overlay.nix) ];
         };
 
         tooling = with pkgs; [
           haskellPackages.haskell-language-server
           ghc
           cabal-install
+          rnix-lsp
         ];
 
-      in {
+      in rec {
         devShell = pkgs.devshell.mkShell {
           name = "hello-nix";
           packages = tooling;
         };
 
-        defaultPackage = pkgs.callPackage ./src
-          { compiler = pkgs.haskell.packages.ghc884;
-          };
+        packages = flake-utils.lib.flattenTree {
+          hello = pkgs.mine.hello; # See ./overlay.nix
+        };
+
+        defaultPackage = packages.hello;
       }
-    ); # // { overlay = import ./overlay.nix {}; };
+    );
 }
